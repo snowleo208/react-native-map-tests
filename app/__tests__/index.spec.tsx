@@ -1,9 +1,21 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { setupServer } from 'msw/node';
+import { amenityDefaultHandler } from '../__mocks__/amenityHandler';
 import App from '../index';
 
-jest.mock('react-native-maps');
+const server = setupServer(amenityDefaultHandler);
 
 describe('App', () => {
+
+    beforeAll(() => server.listen());
+    afterEach(() => server.resetHandlers());
+    afterAll(() => server.close());
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        server.resetHandlers();
+    })
+
     afterEach(() => {
         jest.clearAllMocks();
     })

@@ -7,7 +7,7 @@ import { Amenity, isValidAmenity, Markers, State } from "../types/MapScreen.type
 export const INITIAL_REGION = { "latitude": 51.50681634424901, "latitudeDelta": 0.04419279074402027, "longitude": -0.12822736621703257, "longitudeDelta": 0.05038206547021673 }
 
 const MapScreen = () => {
-    const [currentState, setCurrentState] = useState<State>(State.IDLE);
+    const [currentState, setCurrentState] = useState<State>(State.LOADING);
     const [markers, setMarkers] = useState<Markers[]>([]);
     const [isMarkerSelected, setIsMarkerSelected] = useState(false);
     const [isInOriginalPosition, setIsInOriginalPosition] = useState(true);
@@ -71,7 +71,7 @@ const MapScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Banner
+            {currentState === State.ERROR ? <Banner
                 visible={currentState === State.ERROR}
                 actions={[
                     {
@@ -81,7 +81,7 @@ const MapScreen = () => {
                 ]}
             >
                 There was a problem when fetching cafes, please try again later.
-            </Banner>
+            </Banner> : null}
             <View style={styles.statusTextWrapper}>
                 <Text style={styles.statusText}>{isMarkerSelected ? "You selected the marker!" : "Feel free to move the map around!"}</Text>
             </View>
@@ -106,6 +106,7 @@ const MapScreen = () => {
                             latitude: marker?.latitude,
                             longitude: marker?.longitude,
                         }}
+                        accessibilityLabel={marker?.name}
                         title={marker?.name}
                         onPress={onMakerPressed}
                     />

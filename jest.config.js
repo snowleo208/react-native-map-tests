@@ -3,6 +3,8 @@ module.exports = {
     transform: {
         '^.+\\.(js|jsx|ts|tsx)$': require.resolve('babel-jest'),
     },
+    testEnvironment: 'jest-fixed-jsdom',
+    setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
     transformIgnorePatterns: [
         'node_modules/(?!(react-native' +
         '|expo-modules-core' +
