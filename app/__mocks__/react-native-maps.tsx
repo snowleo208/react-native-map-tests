@@ -16,7 +16,7 @@ const MapView = forwardRef(({ children, onMapReady, ...props }: MapViewProps, re
 
     setTimeout(() => {
       onMapReady();
-    }, 100);
+    }, 200);
   }, [onMapReady]);
 
   return <View testID="mock-map-view"  {...props}>{children}</View>;
