@@ -65,7 +65,7 @@ describe('MapScreen', () => {
         expect(markers).toHaveLength(100);
     });
 
-    it('changes text when selected or deselected marker', async () => {
+    it('kept text when selected marker continuously', async () => {
         render(<MapScreen />);
 
         const map = await screen.findByTestId('mock-map-view');
@@ -82,9 +82,13 @@ describe('MapScreen', () => {
 
         expect(await screen.findByText('You selected the marker!')).toBeDefined();
 
-        expect(screen.queryByText('Feel free to move the map around!')).toBeNull();
 
-        fireEvent(map, 'onMarkerDeselect');
+        const secondMarker = screen.getByLabelText('Mock Café 2');
+        fireEvent.press(secondMarker);
+
+        expect(await screen.findByText('You selected the marker!')).toBeDefined();
+
+        fireEvent.press(map);
 
         expect(await screen.findByText('Feel free to move the map around!')).toBeDefined();
 

@@ -96,7 +96,6 @@ const MapScreen = () => {
                 onPress={() => setIsMarkerSelected(false)}
                 initialRegion={INITIAL_REGION}
                 onPanDrag={onPanDrag}
-                onMarkerDeselect={() => setIsMarkerSelected(false)}
                 onMapReady={onMapReady}
             >
                 {markers.map((marker: Markers) => (
