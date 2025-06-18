@@ -8,9 +8,7 @@ import { amenityDefaultHandler, amenityErrorHandler, generateAmenityManyPinsHand
 const server = setupServer(amenityDefaultHandler);
 
 describe('MapScreen', () => {
-
     beforeAll(() => server.listen());
-    afterEach(() => server.resetHandlers());
     afterAll(() => server.close());
 
     afterEach(() => {

@@ -6,18 +6,12 @@ import App from '../index';
 const server = setupServer(amenityDefaultHandler);
 
 describe('App', () => {
-
     beforeAll(() => server.listen());
-    afterEach(() => server.resetHandlers());
     afterAll(() => server.close());
 
     afterEach(() => {
         jest.clearAllMocks();
         server.resetHandlers();
-    })
-
-    afterEach(() => {
-        jest.clearAllMocks();
     })
 
     it('renders correctly', async () => {
