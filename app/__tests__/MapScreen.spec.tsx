@@ -1,27 +1,32 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
-import { INITIAL_REGION, MapScreen } from '../MapScreen';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { mockMapRef } from '../__mocks__/react-native-maps';
+import MapScreen, { INITIAL_REGION } from '../MapScreen';
 
 describe('MapScreen', () => {
     afterEach(() => {
         jest.clearAllMocks();
     })
 
-    it('renders correctly with the map', () => {
+    it('renders loading state', async () => {
+        process.env.SHOW_LOADING_STATE = 'true';
         render(<MapScreen />);
 
-        expect(screen.getByText('Welcome to my map!')).toBeDefined();
+        expect(screen.getByLabelText('Loading Maps...')).toBeDefined();
 
-        expect(screen.getByTestId('mock-map-view')).toBeDefined();
+        expect(await screen.findByTestId('mock-map-view')).toBeDefined();
+
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
+        })
+
+        delete process.env.SHOW_LOADING_STATE;
     });
 
-
-    it('renders marker', () => {
+    it('renders marker in the map', async () => {
         render(<MapScreen />);
 
         expect(screen.getByTestId('mock-marker')).toBeDefined();
     });
-
 
     it('changes text when selected or deselected marker', async () => {
         render(<MapScreen />);
@@ -33,12 +38,32 @@ describe('MapScreen', () => {
 
         expect(await screen.findByText('You selected the marker!')).toBeDefined();
 
-        expect(screen.queryByText('Welcome to my map!')).toBeNull();
+        expect(screen.queryByText('Feel free to move the map around!')).toBeNull();
+
+        const map = screen.getByTestId('mock-map-view');
+        fireEvent(map, 'onMarkerDeselect');
+
+        expect(await screen.findByText('Feel free to move the map around!')).toBeDefined();
+
+        expect(screen.queryByText('You selected the marker!')).toBeNull();
+    });
+
+    it('changes text when pressed the map', async () => {
+        render(<MapScreen />);
+
+        const marker = screen.getByTestId('mock-marker');
+        expect(marker).toBeDefined();
+
+        fireEvent.press(marker);
+
+        expect(await screen.findByText('You selected the marker!')).toBeDefined();
+
+        expect(screen.queryByText('Feel free to move the map around!')).toBeNull();
 
         const map = screen.getByTestId('mock-map-view');
         fireEvent.press(map);
 
-        expect(await screen.findByText('Welcome to my map!')).toBeDefined();
+        expect(await screen.findByText('Feel free to move the map around!')).toBeDefined();
 
         expect(screen.queryByText('You selected the marker!')).toBeNull();
     });
@@ -49,13 +74,18 @@ describe('MapScreen', () => {
         const map = screen.getByTestId('mock-map-view');
         expect(map).toBeDefined();
 
-        fireEvent(map, 'onRegionChangeComplete', {
-            latitude: 51.5,
-            longitude: -0.1,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
+        fireEvent(map, 'onPanDrag', {
+            nativeEvent: {
+                coordinate: {
+                    latitude: 37.78825,
+                    longitude: -122.4324,
+                },
+                position: {
+                    x: 100,
+                    y: 200,
+                },
+            },
         });
-
 
         expect(await screen.findByRole('button', { name: 'Back to original position' })).toBeDefined();
     });
@@ -63,14 +93,20 @@ describe('MapScreen', () => {
     it('backs to original position when clicked button', async () => {
         render(<MapScreen />);
 
-        const map = screen.getByTestId('mock-map-view');
+        const map = await screen.findByTestId('mock-map-view');
         expect(map).toBeDefined();
 
-        fireEvent(map, 'onRegionChangeComplete', {
-            latitude: 51.5,
-            longitude: -0.1,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
+        fireEvent(map, 'onPanDrag', {
+            nativeEvent: {
+                coordinate: {
+                    latitude: 37.78825,
+                    longitude: -122.4324,
+                },
+                position: {
+                    x: 100,
+                    y: 200,
+                },
+            },
         });
 
         const changePositionButton = await screen.findByRole('button', { name: 'Back to original position' });

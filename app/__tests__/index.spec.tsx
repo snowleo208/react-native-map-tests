@@ -1,12 +1,22 @@
-import { render, screen } from '@testing-library/react-native';
+import { render, screen, waitFor } from '@testing-library/react-native';
 import App from '../index';
 
+jest.mock('react-native-maps');
+
 describe('App', () => {
-    it('renders correctly', () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    })
+
+    it('renders correctly', async () => {
         render(<App />);
 
-        expect(screen.getByText('Welcome to my map!')).toBeDefined();
+        expect(screen.getByText('Feel free to move the map around!')).toBeDefined();
 
-        expect(screen.getByTestId('mock-map-view')).toBeDefined();
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
+        })
+
+        expect(await screen.findByTestId('mock-map-view')).toBeDefined();
     });
 });

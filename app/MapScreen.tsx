@@ -1,17 +1,12 @@
-import { Button } from "@react-navigation/elements";
-import { NavigationContainer } from "@react-navigation/native";
 import { useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
+import { ActivityIndicator, Button, MD2Colors } from 'react-native-paper';
 
-export const INITIAL_REGION = {
-    latitude: 51.5074,
-    longitude: -0.1278,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-}
+export const INITIAL_REGION = { "latitude": 51.50681634424901, "latitudeDelta": 0.04419279074402027, "longitude": -0.12822736621703257, "longitudeDelta": 0.05038206547021673 }
 
-export const MapScreen = () => {
+const MapScreen = () => {
+    const [isMapLoaded, setIsMapLoaded] = useState(false);
     const [isMarkerSelected, setIsMarkerSelected] = useState(false);
     const [isInOriginalPosition, setIsInOriginalPosition] = useState(true);
     const mapRef = useRef<MapView>(null);
@@ -20,10 +15,8 @@ export const MapScreen = () => {
         setIsMarkerSelected(true);
     }
 
-    const onRegionChangeComplete = (region: Region) => {
-        const matchedInitialPostiion = region.latitude === INITIAL_REGION.latitude && region.longitude === INITIAL_REGION.longitude;
-
-        setIsInOriginalPosition(matchedInitialPostiion);
+    const onPanDrag = () => {
+        setIsInOriginalPosition(false);
     }
 
     const onPressBackToPosButton = () => {
@@ -34,32 +27,49 @@ export const MapScreen = () => {
         setIsInOriginalPosition(true);
     }
 
-    return (
-        <NavigationContainer>
-            <View style={styles.container}>
-                <Text>{isMarkerSelected ? "You selected the marker!" : "Welcome to my map!"}</Text>
-                <MapView
-                    ref={mapRef}
-                    style={styles.map}
-                    onPress={() => setIsMarkerSelected(false)}
-                    initialRegion={INITIAL_REGION}
-                    onRegionChangeComplete={onRegionChangeComplete}
-                    provider={PROVIDER_GOOGLE}
-                >
-                    <Marker
-                        coordinate={{ latitude: 51.5074, longitude: -0.1278 }}
-                        title="London"
-                        description="Capital of UK"
-                        onPress={onMakerPressed}
-                    />
-                </MapView>
-                {!isInOriginalPosition ? <Button onPress={onPressBackToPosButton}>Back to original position</Button> : null}
-            </View>
+    const onMapReady = () => {
+        setIsMapLoaded(true);
+    }
 
-        </NavigationContainer>
+    return (
+        <View style={styles.container}>
+            <View style={styles.statusTextWrapper}>
+                <Text style={styles.statusText}>{isMarkerSelected ? "You selected the marker!" : "Feel free to move the map around!"}</Text>
+            </View>
+            {!isMapLoaded ? <View>
+                <ActivityIndicator accessibilityLabel="Loading Maps..." animating={true} color={MD2Colors.deepPurple500} />
+            </View> : null}
+            <MapView
+                ref={mapRef}
+                style={styles.map}
+                onPress={() => setIsMarkerSelected(false)}
+                initialRegion={INITIAL_REGION}
+                onPanDrag={onPanDrag}
+                onMarkerDeselect={() => setIsMarkerSelected(false)}
+                onMapReady={onMapReady}
+            >
+                <Marker
+                    coordinate={{ latitude: 51.50681634424901, longitude: -0.12822736621703257 }}
+                    title="London"
+                    description="Capital of UK"
+                    onPress={onMakerPressed}
+                />
+            </MapView>
+            {!isInOriginalPosition ?
+                <View style={styles.buttonWrapper}>
+                    <Button mode="contained" style={styles.backToPositionButton} onPress={onPressBackToPosButton}>Back to original position</Button>
+                </View>
+                : null}
+        </View>
     );
 }
 const styles = StyleSheet.create({
     container: { flex: 1 },
     map: { flex: 1 },
+    statusTextWrapper: { padding: 8 },
+    statusText: { fontSize: 16 },
+    buttonWrapper: { position: 'absolute', bottom: 0, width: '100%', alignItems: 'center', paddingBottom: 32 },
+    backToPositionButton: { flex: 0 },
 });
+
+export default MapScreen;
