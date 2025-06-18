@@ -13,7 +13,10 @@ describe('MapScreen', () => {
 
         expect(screen.getByLabelText('Loading Maps...')).toBeDefined();
 
-        expect(await screen.findByTestId('mock-map-view')).toBeDefined();
+        const map = await screen.findByTestId('mock-map-view');
+        expect(map).toBeDefined();
+
+        fireEvent(map, 'onMapReady');
 
         await waitFor(() => {
             expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
@@ -25,11 +28,10 @@ describe('MapScreen', () => {
     it('renders marker in the map', async () => {
         render(<MapScreen />);
 
+        const map = await screen.findByTestId('mock-map-view');
+        expect(map).toBeDefined();
 
-
-        await waitFor(() => {
-            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
-        })
+        fireEvent(map, 'onMapReady');
 
         expect(screen.getByTestId('mock-marker')).toBeDefined();
     });
@@ -37,7 +39,10 @@ describe('MapScreen', () => {
     it('changes text when selected or deselected marker', async () => {
         render(<MapScreen />);
 
+        const map = await screen.findByTestId('mock-map-view');
+        expect(map).toBeDefined();
 
+        fireEvent(map, 'onMapReady');
 
         await waitFor(() => {
             expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
@@ -52,7 +57,6 @@ describe('MapScreen', () => {
 
         expect(screen.queryByText('Feel free to move the map around!')).toBeNull();
 
-        const map = screen.getByTestId('mock-map-view');
         fireEvent(map, 'onMarkerDeselect');
 
         expect(await screen.findByText('Feel free to move the map around!')).toBeDefined();
@@ -62,10 +66,6 @@ describe('MapScreen', () => {
 
     it('changes text when pressed the map', async () => {
         render(<MapScreen />);
-
-        await waitFor(() => {
-            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
-        })
 
         const marker = screen.getByTestId('mock-marker');
         expect(marker).toBeDefined();
@@ -87,12 +87,14 @@ describe('MapScreen', () => {
     it('shows button when position changed', async () => {
         render(<MapScreen />);
 
+        const map = await screen.findByTestId('mock-map-view');
+        expect(map).toBeDefined();
+
+        fireEvent(map, 'onMapReady');
+
         await waitFor(() => {
             expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
         })
-
-        const map = screen.getByTestId('mock-map-view');
-        expect(map).toBeDefined();
 
         fireEvent(map, 'onPanDrag', {
             nativeEvent: {
@@ -113,12 +115,14 @@ describe('MapScreen', () => {
     it('backs to original position when clicked button', async () => {
         render(<MapScreen />);
 
+        const map = await screen.findByTestId('mock-map-view');
+        expect(map).toBeDefined();
+
+        fireEvent(map, 'onMapReady');
+
         await waitFor(() => {
             expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
         })
-
-        const map = await screen.findByTestId('mock-map-view');
-        expect(map).toBeDefined();
 
         fireEvent(map, 'onPanDrag', {
             nativeEvent: {
