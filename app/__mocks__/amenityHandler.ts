@@ -31,3 +31,18 @@ export const amenityDefaultHandler = http.get('https://overpass-api.de/api/inter
 export const amenityErrorHandler = http.get('https://overpass-api.de/api/interpreter', () => {
     return HttpResponse.text('Server Error', { status: 500 })
 })
+
+export const generateAmenityManyPinsHandler = (count: number) => http.get('https://overpass-api.de/api/interpreter', () => {
+    const markers = Array.from({ length: count }, (_, i) => ({
+        id: i + 1,
+        lat: 51.51 + i * 0.001,
+        lon: -0.12 + i * 0.001,
+        tags: {
+            name: `Mock Café ${i + 1}`,
+        },
+    }));
+
+    return HttpResponse.json({
+        elements: markers,
+    });
+})

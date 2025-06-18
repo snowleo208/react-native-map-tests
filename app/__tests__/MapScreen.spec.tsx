@@ -3,7 +3,7 @@ import { mockMapRef } from '../__mocks__/react-native-maps';
 import MapScreen, { INITIAL_REGION } from '../MapScreen';
 
 import { setupServer } from 'msw/node';
-import { amenityDefaultHandler, amenityErrorHandler } from '../__mocks__/amenityHandler';
+import { amenityDefaultHandler, amenityErrorHandler, generateAmenityManyPinsHandler } from '../__mocks__/amenityHandler';
 
 const server = setupServer(amenityDefaultHandler);
 
@@ -49,7 +49,22 @@ describe('MapScreen', () => {
         expect(screen.getByLabelText('Mock Café 1')).toBeDefined();
 
         expect(screen.queryByText('There was a problem when fetching cafes, please try again later.')).not.toBeVisible();
+    });
 
+    it('renders max 100 pins in the map', async () => {
+        server.use(generateAmenityManyPinsHandler(101));
+        render(<MapScreen />);
+
+        const map = await screen.findByTestId('mock-map-view');
+        expect(map).toBeDefined();
+
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
+        })
+
+        const markers = await screen.findAllByTestId('mock-marker');
+        expect(markers).toBeDefined();
+        expect(markers).toHaveLength(100);
     });
 
     it('changes text when selected or deselected marker', async () => {
