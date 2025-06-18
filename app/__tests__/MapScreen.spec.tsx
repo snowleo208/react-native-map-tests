@@ -25,11 +25,23 @@ describe('MapScreen', () => {
     it('renders marker in the map', async () => {
         render(<MapScreen />);
 
+
+
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
+        })
+
         expect(screen.getByTestId('mock-marker')).toBeDefined();
     });
 
     it('changes text when selected or deselected marker', async () => {
         render(<MapScreen />);
+
+
+
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
+        })
 
         const marker = screen.getByTestId('mock-marker');
         expect(marker).toBeDefined();
@@ -51,6 +63,10 @@ describe('MapScreen', () => {
     it('changes text when pressed the map', async () => {
         render(<MapScreen />);
 
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
+        })
+
         const marker = screen.getByTestId('mock-marker');
         expect(marker).toBeDefined();
 
@@ -70,6 +86,10 @@ describe('MapScreen', () => {
 
     it('shows button when position changed', async () => {
         render(<MapScreen />);
+
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
+        })
 
         const map = screen.getByTestId('mock-map-view');
         expect(map).toBeDefined();
@@ -92,6 +112,10 @@ describe('MapScreen', () => {
 
     it('backs to original position when clicked button', async () => {
         render(<MapScreen />);
+
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
+        })
 
         const map = await screen.findByTestId('mock-map-view');
         expect(map).toBeDefined();
