@@ -6,7 +6,7 @@ export const mockMapRef = {
   animateToRegion: jest.fn(),
 };
 
-const MapView = forwardRef(({ children, onLayout, ...props }: MapViewProps, ref: React.Ref<unknown>) => {
+const MapView = forwardRef(({ children, onLayout, onMapReady, ...props }: MapViewProps, ref: React.Ref<unknown>) => {
   useImperativeHandle(ref, () => mockMapRef);
 
   useLayoutEffect(() => {
@@ -16,6 +16,10 @@ const MapView = forwardRef(({ children, onLayout, ...props }: MapViewProps, ref:
           layout: { x: 0, y: 0, width: 300, height: 400 },
         },
       } as unknown as LayoutChangeEvent);
+    }
+
+    if (onMapReady) {
+      onMapReady();
     }
 
   }, [onLayout]);

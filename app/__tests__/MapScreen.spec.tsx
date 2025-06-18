@@ -2,9 +2,18 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { mockMapRef } from '../__mocks__/react-native-maps';
 import MapScreen, { INITIAL_REGION } from '../MapScreen';
 
+import { setupServer } from 'msw/node';
+import { amenityDefaultHandler, amenityErrorHandler, generateAmenityManyPinsHandler } from '../__mocks__/amenityHandler';
+
+const server = setupServer(amenityDefaultHandler);
+
 describe('MapScreen', () => {
+    beforeAll(() => server.listen());
+    afterAll(() => server.close());
+
     afterEach(() => {
         jest.clearAllMocks();
+        server.resetHandlers();
     })
 
     it('renders loading state', async () => {
@@ -16,13 +25,9 @@ describe('MapScreen', () => {
         const map = await screen.findByTestId('mock-map-view');
         expect(map).toBeDefined();
 
-        fireEvent(map, 'onMapReady');
-
         await waitFor(() => {
             expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
         })
-
-        delete process.env.SHOW_LOADING_STATE;
     });
 
     it('renders marker in the map', async () => {
@@ -31,9 +36,33 @@ describe('MapScreen', () => {
         const map = await screen.findByTestId('mock-map-view');
         expect(map).toBeDefined();
 
-        fireEvent(map, 'onMapReady');
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
+        })
 
-        expect(screen.getByTestId('mock-marker')).toBeDefined();
+        const markers = await screen.findAllByTestId('mock-marker');
+        expect(markers).toBeDefined();
+        expect(markers).toHaveLength(2);
+
+        expect(screen.getByLabelText('Mock Café 1')).toBeDefined();
+
+        expect(screen.queryByText('There was a problem when fetching cafes, please try again later.')).not.toBeVisible();
+    });
+
+    it('renders max 100 pins in the map', async () => {
+        server.use(generateAmenityManyPinsHandler(101));
+        render(<MapScreen />);
+
+        const map = await screen.findByTestId('mock-map-view');
+        expect(map).toBeDefined();
+
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
+        })
+
+        const markers = await screen.findAllByTestId('mock-marker');
+        expect(markers).toBeDefined();
+        expect(markers).toHaveLength(100);
     });
 
     it('changes text when selected or deselected marker', async () => {
@@ -42,13 +71,11 @@ describe('MapScreen', () => {
         const map = await screen.findByTestId('mock-map-view');
         expect(map).toBeDefined();
 
-        fireEvent(map, 'onMapReady');
-
         await waitFor(() => {
             expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
         })
 
-        const marker = screen.getByTestId('mock-marker');
+        const marker = screen.getByLabelText('Mock Café 1');
         expect(marker).toBeDefined();
 
         fireEvent.press(marker);
@@ -67,7 +94,7 @@ describe('MapScreen', () => {
     it('changes text when pressed the map', async () => {
         render(<MapScreen />);
 
-        const marker = screen.getByTestId('mock-marker');
+        const marker = await screen.findByLabelText('Mock Café 1');
         expect(marker).toBeDefined();
 
         fireEvent.press(marker);
@@ -89,8 +116,6 @@ describe('MapScreen', () => {
 
         const map = await screen.findByTestId('mock-map-view');
         expect(map).toBeDefined();
-
-        fireEvent(map, 'onMapReady');
 
         await waitFor(() => {
             expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
@@ -117,8 +142,6 @@ describe('MapScreen', () => {
 
         const map = await screen.findByTestId('mock-map-view');
         expect(map).toBeDefined();
-
-        fireEvent(map, 'onMapReady');
 
         await waitFor(() => {
             expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
@@ -151,5 +174,27 @@ describe('MapScreen', () => {
         expect(mockMapRef.animateToRegion).toHaveBeenCalledTimes(1);
 
         expect(screen.queryByRole('button', { name: 'Back to original position' })).toBeNull();
+    });
+
+    it('shows error state', async () => {
+        server.use(amenityErrorHandler);
+        render(<MapScreen />);
+
+        const map = await screen.findByTestId('mock-map-view');
+        expect(map).toBeDefined();
+
+        await waitFor(() => {
+            expect(screen.queryByLabelText('Loading Maps...')).toBeNull();
+        })
+
+        expect(screen.getByText('There was a problem when fetching cafes, please try again later.')).toBeVisible();
+
+        const closeButton = screen.getByRole('button', { name: 'Close' })
+
+        fireEvent.press(closeButton);
+
+        await waitFor(() => {
+            expect(screen.queryByText('There was a problem when fetching cafes, please try again later.')).toBeNull();
+        })
     });
 });
