@@ -35,7 +35,7 @@ export const amenityErrorHandler = http.get('https://overpass-api.de/api/interpr
 export const generateAmenityManyPinsHandler = (count: number) => http.get('https://overpass-api.de/api/interpreter', () => {
     const markers = Array.from({ length: count }, (_, i) => ({
         id: i + 1,
-        lat: 51.51 + i * 0.001,
+        lat: 51.51 + i * 0.001, // slight offset to spread markers vertically
         lon: -0.12 + i * 0.001,
         tags: {
             name: `Mock Café ${i + 1}`,

@@ -33,3 +33,7 @@ Make sure you have an Android emulator running or a device connected.
 - Mocking react-native-maps for unit testing
 - Using `@testing-library/react-native` for rendering and firing events
 - Proper Jest setup for React Native components
+
+### Screenshot
+
+![An mobile application with lots of pins for cafes and a purple button to go back to initial position](map-screen.jpeg)
