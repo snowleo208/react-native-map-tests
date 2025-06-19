@@ -1,6 +1,6 @@
 # 🗺️ React Native Maps Testing Example
 
-This is a minimal example project demonstrating **how to write unit tests with `react-native-maps`** in a **React Native + Expo** app.
+This is a minimal example project demonstrating how to write unit tests with `react-native-maps`.
 
 Created using [`create-expo-app`](https://docs.expo.dev/get-started/create-a-new-app/), this project sets up mocks and test configuration to allow smooth testing of map-based components.
 
@@ -36,4 +36,4 @@ Make sure you have an Android emulator running or a device connected.
 
 ### Screenshot
 
-![An mobile application with lots of pins for cafes and a purple button to go back to initial position](map-screen.jpeg)
+![A mobile app interface displaying a map with numerous pins marking café locations. A purple button is visible for returning to the map's default position.](map-screen.jpeg)
