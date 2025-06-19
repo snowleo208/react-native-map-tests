@@ -15,6 +15,7 @@ const MapView = forwardRef(({ children, onLayout, onMapReady, ...props }: MapVie
         nativeEvent: {
           layout: { x: 0, y: 0, width: 300, height: 400 },
         },
+        // Note: use `as LayoutChangeEvent` here as it's hard to mock `NativeSyntheticEvent<{layout: LayoutRectangle}>` manually
       } as unknown as LayoutChangeEvent);
     }
 
